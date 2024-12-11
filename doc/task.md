@@ -22,6 +22,8 @@ and plotting the resulting outcomes,
 **include a comprehensive textual introduction, accompanied by relevant figures and charts**
 
 https://or.stackexchange.com/questions/79/where-can-i-find-test-instances-for-convex-quadratic-programming
+https://pypi.org/project/qpsolvers_benchmark/
+
 
 https://github.com/ralna/QPLIB
 
