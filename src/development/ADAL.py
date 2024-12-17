@@ -3,7 +3,7 @@ from utils import standard_constraints,Pc
 
 def ADAL(A1:np.ndarray, A2:np.ndarray ,b1:np.ndarray ,b2: np.ndarray,q:np.ndarray,P:np.ndarray,x0, y0, z0, eta, rho, alpha,sigma=1e-6):
     A,l,u = standard_constraints(A2,-b2,A1,-b1)
-    x = Pc(x0,l,u)
+    x = x0
     y = y0
     z = z0
     def solve_linear_sys():
