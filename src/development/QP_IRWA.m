@@ -1,15 +1,23 @@
-function x = IRWA(A1, A2, b1, b2, g, H, x0, epsilon0, eta, gamma, M, prim_tol, dual_tol, max_iter)
+function x = QP_IRWA(A1, A2, b1, b2, g, H)
     A = [A1;A2];
     b = [b1;b2];
-    x = x0;
-    epsilon = epsilon0;
 
+    n = size(g,1);
+    m = size(A,1);
+    epsilon = 0.1*ones(m,1);
+    x = zeros(n,1);
+    eta = 0.9;
+    gamma = 0.7;
+    M = 100;
+    prim_tol = 1e-6;
+    dual_tol = 1e-12;
+    max_iter = 4000;
 
     for k = 1:max_iter
         Eq = A1*x;
         Ineq = A2*x;
         w = [Eq+b1;(max(Ineq,-b2)+b2)];
-        w = (epsilon.^2+w.^2).^(-0.5);
+        w = (epsilon.^2+w.^2).^(-0.5)+1./epsilon;
         W = diag(w);
         v = [b1;max(-Ineq,b2)];
         H_tilde = H + A' * W * A;
@@ -22,6 +30,7 @@ function x = IRWA(A1, A2, b1, b2, g, H, x0, epsilon0, eta, gamma, M, prim_tol, d
         if all(abs(q) <= M * ((r.^2 + epsilon.^2).^(0.5 + gamma)))
             epsilon = epsilon * eta;
         end
+        
         % Step 3: Check stopping criteria
         if norm(x_next - x) <= prim_tol && norm(epsilon) <= dual_tol
             x = x_next;
