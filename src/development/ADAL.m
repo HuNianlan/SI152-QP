@@ -1,36 +1,23 @@
-function x = ADAL(A1, A2, b1, b2, q, P, x0, y0, z0, eta, rho, alpha, sigma,sigma_prime)
-    if nargin < 13
-        sigma = 1e-6;
-    end
-    % Import necessary utility functions
-    [A, l, u] = standard_constraints(A2, -b2, A1, -b1);
+function x = ADAL(A, l,u,q,P,x0, y0, z0, rho, prim_tol,dual_tol,max_iter)
     x = x0;
-    y = y0;
     z = z0;
-    function [x_hat, v] = solve_linear_sys()
-        M = [P + eta * eye(size(P, 1)), A'; 
-            A, -1 / rho * eye(size(A, 1))];
-        b = [eta * x - q; z - 1 / rho * y];
-        xv = lsqminnorm(M,b);
-        % xv = M \ b;  % Solve the linear system
-        x_hat = xv(1:size(P, 1));
-        v = xv(size(P, 1) + 1:end);
-    end
+    y = y0;
 
-    while true
-        [x_hat, v] = solve_linear_sys();
-        z_hat = z + 1 / rho * (v - y);
-        x_next = alpha * x_hat + (1 - alpha) * x;
-        z_next = Pc(alpha * z_hat + (1 - alpha) * z + 1 / rho * y, l, u);
-        y = y + rho * (alpha * z_hat + (1 - alpha) * z - z_next);
-        z = z_next;
-        r = P * x_next + q + A' * y;
+    for k = 1:max_iter
 
-        if norm(x_next - x, 2) <= sigma && norm(r, 2) <= sigma_prime
-            x = x_next;
+        KKT_matrix = P + rho * (A' * A);
+        rhs = -q + A' * (rho * z - y);
+        x = KKT_matrix \ rhs;
+
+        z = Pc(A * x + y / rho, l, u);
+
+        y = y + rho * (A * x - z);
+
+        primal_residual = norm(A * x - z);
+        dual_residual = rho * norm(A' * (z - A * x));
+
+        if primal_residual < prim_tol && dual_residual < dual_tol
             break;
         end
-
-        x = x_next;
     end
 end
