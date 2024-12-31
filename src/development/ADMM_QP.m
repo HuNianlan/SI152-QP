@@ -9,7 +9,7 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
     y = zeros(m,1);
     z = zeros(m,1);
     rho = 0.1;
-    prim_tol = 1e-4;
+    prim_tol = 1e-6;
     dual_tol = 1e-6;
     max_iter = 100;
     if n<100
@@ -24,23 +24,22 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
         RHO_MIN = 1e-06;
         RHO_MAX=1;
         DIVISION_TOL = 1e-20;
-        prim_res_norm = norm(z,1);
-        temp_res_norm = norm(A*x,1); 
+        prim_res_norm = norm(z,inf);
+        temp_res_norm = norm(A*x,inf); 
         prim_res_norm = max(prim_res_norm, temp_res_norm);
         prim_res = prim_res/(prim_res_norm + DIVISION_TOL);
         
-        dual_res_norm = norm(q,1);
-        temp_res_norm = norm(A'*y,1);
+        dual_res_norm = norm(q,inf);
+        temp_res_norm = norm(A'*y,inf);
         dual_res_norm = max(dual_res_norm, temp_res_norm);
-        temp_res_norm = norm(P*x,1);
+        temp_res_norm = norm(P*x,inf);
         dual_res_norm = max(dual_res_norm, temp_res_norm);
         dual_res = dual_res/(dual_res_norm + DIVISION_TOL);
     
-        rho_estimate = norm(rho * sqrt(prim_res / dual_res),1);
+        rho_estimate = norm(rho * sqrt(prim_res / dual_res),inf);
         rho_estimate = min(max(rho_estimate, RHO_MIN), RHO_MAX);
     end
     for i = 1: max_iter
-        x_prev = x;
         for j = 1:inner_loop
             M = P + sigma * eye(n) + rho * (A'* A);
             b =  sigma* x - q + A'*(rho*z - y );
@@ -57,14 +56,10 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
                 x = x_next;
                 break;
             end
-            if norm(x-x_next,2)<1e-5
-                break
-            end
-            x_prev = x;
             x = x_next;
         end
-        if norm(x-x_prev,2)<1e-5
-            break
+        if norm(prim_res) <= prim_tol && norm(dual_res) <= dual_tol
+            break;
         end
         rho = compute_rho();
     end
