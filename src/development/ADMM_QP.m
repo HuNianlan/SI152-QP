@@ -11,7 +11,7 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
     rho = 0.1;
     prim_tol = 1e-4;
     dual_tol = 1e-6;
-    max_iter = 2;
+    max_iter = 100;
     if n<100
         inner_loop = 50;
     elseif n<1000
@@ -22,7 +22,7 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
     
     function rho_estimate = compute_rho()
         RHO_MIN = 1e-06;
-        RHO_MAX=1e06;
+        RHO_MAX=1;
         DIVISION_TOL = 1e-20;
         prim_res_norm = norm(z,1);
         temp_res_norm = norm(A*x,1); 
@@ -40,6 +40,7 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
         rho_estimate = min(max(rho_estimate, RHO_MIN), RHO_MAX);
     end
     for i = 1: max_iter
+        x_prev = x;
         for j = 1:inner_loop
             M = P + sigma * eye(n) + rho * (A'* A);
             b =  sigma* x - q + A'*(rho*z - y );
@@ -56,11 +57,14 @@ function x = ADMM_QP(A1,A2,b1,b2, q, P)
                 x = x_next;
                 break;
             end
-            
+            if norm(x-x_next,2)<1e-5
+                break
+            end
+            x_prev = x;
             x = x_next;
         end
-        if norm(prim_res) <= prim_tol && norm(dual_res) <= dual_tol
-            break;
+        if norm(x-x_prev,2)<1e-5
+            break
         end
         rho = compute_rho();
     end
