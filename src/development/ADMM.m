@@ -31,7 +31,7 @@ function x = ADMM(A1,A2,b1,b2, q, P, x0, y0, z0,rho,prim_tol,dual_tol,max_iter)
         z = z_next;
         r = P * x_next + q + A' * y;
 
-        if norm(x_next - x) <= prim_tol && norm(r) <= dual_tol
+        if norm(x_next - x,inf) <= prim_tol && norm(r,inf) <= dual_tol
             x = x_next;
             break;
         end

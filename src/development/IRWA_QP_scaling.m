@@ -54,10 +54,11 @@ function x = IRWA_QP_scaling(A1, A2, b1, b2, g, H)
         if all(abs(q) <= M * ((r.^2 + epsilon.^2).^(0.5 + gamma)))
             epsilon = epsilon * eta;
         end
-        primal =norm(x_next - x,inf);
+        
+        xr =norm(x_next - x,inf);
         er =norm(epsilon,inf);
         % Step 3: Check stopping criteria
-        if primal <= prim_tol && er <= dual_tol
+        if xr <= prim_tol && er <= dual_tol
             x = x_next;
             break;
         end

@@ -23,7 +23,7 @@ function x = IRWA(A1, A2, b1, b2, g, H, x0, epsilon0, eta, gamma, M, prim_tol, d
             epsilon = epsilon * eta;
         end
         % Step 3: Check stopping criteria
-        if norm(x_next - x) <= prim_tol && norm(epsilon) <= dual_tol
+        if norm(x_next - x,inf) <= prim_tol && norm(epsilon,inf) <= dual_tol
             x = x_next;
             break;
         end
