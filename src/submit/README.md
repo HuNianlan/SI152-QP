@@ -10,7 +10,7 @@ the code for each algorithm is written in
 - IRWA: `IRWA_QP_scaling.m`
 - ADMM: `ADMM_QP.m`
 
-Other helper function: **Please put them in the environment when running the code**
+Other helper function: **Please put them in the environment at runtime**
 - `conjgrad.m`
 - `Pc.m`
 - `standard_constraints`: to meet the osqp api for comparison
